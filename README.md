@@ -1,0 +1,302 @@
+# Core - Reusable Spring Boot Library
+
+A comprehensive, production-ready Spring Boot core library that provides common functionality and best practices for building enterprise applications.
+
+## Features
+
+### Exception Handling
+- **Base Exception Framework**: Hierarchical exception classes with HTTP status mapping
+- **Global Exception Handler**: Centralized exception handling with standardized error responses
+- **Custom Exceptions**:
+  - `BusinessException`: For business logic errors
+  - `ResourceNotFoundException`: For missing resources
+  - `UnauthorizedException`: For authentication failures
+  - `ForbiddenException`: For authorization failures
+
+### Response Wrappers
+- **ApiResponse**: Generic wrapper for successful API responses
+- **PageResponse**: Paginated response wrapper with Spring Data integration
+- **ErrorResponse**: Standardized error response structure with validation support
+
+### Base Entities
+- **BaseEntity**: Abstract entity with automatic audit fields:
+  - `id`, `createdAt`, `updatedAt`, `createdBy`, `updatedBy`, `version`
+- **SoftDeleteEntity**: Extends BaseEntity with soft delete functionality
+- **JPA Auditing**: Automatic population of audit fields
+
+### Utility Classes
+- **DateTimeUtil**: Date and time operations and formatting
+- **StringUtil**: String manipulation, validation, and transformation
+- **JsonUtil**: JSON serialization/deserialization with Jackson
+- **ValidationUtil**: Programmatic validation utilities
+
+### Validation
+- **Custom Validators**:
+  - `@PhoneNumber`: Phone number validation
+- **ValidationUtil**: Programmatic validation with exception handling
+
+### Configuration
+- **JpaAuditingConfig**: Automatic JPA auditing configuration
+- **JacksonConfig**: JSON serialization/deserialization configuration
+- **WebMvcConfig**: Web MVC and CORS configuration
+
+### Aspect-Oriented Programming
+- **LoggingAspect**:
+  - `@LogExecutionTime`: Automatic method execution time logging
+  - Controller method logging with arguments and results
+
+### Constants & Enums
+- **ApiConstants**: API versioning, headers, pagination defaults
+- **ErrorMessages**: Standardized error messages
+- **Status**: Common entity status enum
+- **SortDirection**: Sort direction enum with Spring Data integration
+
+## Getting Started
+
+### Prerequisites
+- Java 17 or higher
+- Maven 3.6+
+
+### Installation
+
+Add this library as a dependency to your Spring Boot project:
+
+```xml
+<dependency>
+    <groupId>pro.thinhha</groupId>
+    <artifactId>core</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+</dependency>
+```
+
+### Usage Examples
+
+#### Using Base Entity
+
+```java
+@Entity
+@Table(name = "users")
+public class User extends BaseEntity {
+    private String username;
+    private String email;
+    // ... other fields
+}
+```
+
+#### Using Response Wrappers
+
+```java
+@RestController
+@RequestMapping("/api/v1/users")
+public class UserController {
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiResponse<User>> getUser(@PathVariable Long id) {
+        User user = userService.findById(id);
+        return ResponseEntity.ok(ApiResponse.success(user));
+    }
+
+    @GetMapping
+    public ResponseEntity<ApiResponse<PageResponse<User>>> getUsers(Pageable pageable) {
+        Page<User> userPage = userService.findAll(pageable);
+        return ResponseEntity.ok(ApiResponse.success(PageResponse.from(userPage)));
+    }
+}
+```
+
+#### Using Custom Exceptions
+
+```java
+@Service
+public class UserService {
+
+    public User findById(Long id) {
+        return userRepository.findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException("User", id.toString()));
+    }
+
+    public void createUser(UserDto dto) {
+        if (userRepository.existsByEmail(dto.getEmail())) {
+            throw new BusinessException("User with this email already exists", "USER_ALREADY_EXISTS");
+        }
+        // ... create user
+    }
+}
+```
+
+#### Using Logging Aspect
+
+```java
+@Service
+public class UserService {
+
+    @LogExecutionTime
+    public User findById(Long id) {
+        // This method's execution time will be automatically logged
+        return userRepository.findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException("User", id.toString()));
+    }
+}
+```
+
+#### Using Utility Classes
+
+```java
+// String utilities
+String email = "test@example.com";
+if (StringUtil.isValidEmail(email)) {
+    // Process email
+}
+
+// JSON utilities
+User user = new User();
+String json = JsonUtil.toJson(user);
+User deserializedUser = JsonUtil.fromJson(json, User.class);
+
+// Date utilities
+String formattedDate = DateTimeUtil.format(LocalDateTime.now(), DateTimeUtil.CUSTOM_DATE_TIME);
+
+// Validation utilities
+ValidationUtil.validateAndThrow(userDto);
+```
+
+#### Using Custom Validators
+
+```java
+public class UserDto {
+
+    @NotBlank
+    @Email
+    private String email;
+
+    @PhoneNumber
+    private String phoneNumber;
+
+    // ... other fields
+}
+```
+
+## Project Structure
+
+```
+core/
+├── src/main/java/pro/thinhha/core/
+│   ├── annotation/          # Custom annotations
+│   │   └── LogExecutionTime.java
+│   ├── aspect/              # AOP aspects
+│   │   └── LoggingAspect.java
+│   ├── config/              # Configuration classes
+│   │   ├── JacksonConfig.java
+│   │   ├── JpaAuditingConfig.java
+│   │   └── WebMvcConfig.java
+│   ├── constant/            # Constants
+│   │   ├── ApiConstants.java
+│   │   └── ErrorMessages.java
+│   ├── dto/                 # Data Transfer Objects
+│   │   ├── ApiResponse.java
+│   │   ├── ErrorResponse.java
+│   │   └── PageResponse.java
+│   ├── entity/              # Base entity classes
+│   │   ├── BaseEntity.java
+│   │   └── SoftDeleteEntity.java
+│   ├── enums/               # Enumerations
+│   │   ├── SortDirection.java
+│   │   └── Status.java
+│   ├── exception/           # Exception classes
+│   │   ├── BaseException.java
+│   │   ├── BusinessException.java
+│   │   ├── ForbiddenException.java
+│   │   ├── ResourceNotFoundException.java
+│   │   └── UnauthorizedException.java
+│   ├── handler/             # Exception handlers
+│   │   └── GlobalExceptionHandler.java
+│   ├── util/                # Utility classes
+│   │   ├── DateTimeUtil.java
+│   │   ├── JsonUtil.java
+│   │   └── StringUtil.java
+│   └── validator/           # Custom validators
+│       ├── PhoneNumber.java
+│       ├── PhoneNumberValidator.java
+│       └── ValidationUtil.java
+└── pom.xml
+```
+
+## Dependencies
+
+Key dependencies included:
+- Spring Boot 3.5.6
+- Spring Data JPA
+- Spring Validation
+- Spring AOP
+- Lombok
+- Jackson (JSON processing)
+- Apache Commons Lang3
+- Apache Commons Collections4
+
+## Configuration
+
+### Enable Component Scanning
+
+In your main application, make sure to scan the core package:
+
+```java
+@SpringBootApplication
+@ComponentScan(basePackages = {"com.yourcompany", "pro.thinhha.core"})
+public class YourApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(YourApplication.class, args);
+    }
+}
+```
+
+### Customize Auditing
+
+Override the default `AuditorAware` implementation to provide actual user information:
+
+```java
+@Configuration
+public class CustomAuditingConfig {
+
+    @Bean
+    public AuditorAware<String> auditorProvider() {
+        return () -> {
+            // Get current user from SecurityContext
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication == null || !authentication.isAuthenticated()) {
+                return Optional.of("system");
+            }
+            return Optional.of(authentication.getName());
+        };
+    }
+}
+```
+
+## Best Practices
+
+1. **Extend Base Entities**: Use `BaseEntity` or `SoftDeleteEntity` for automatic audit tracking
+2. **Use Response Wrappers**: Standardize API responses with `ApiResponse` and `PageResponse`
+3. **Throw Custom Exceptions**: Use the provided exception hierarchy for consistent error handling
+4. **Apply Logging Annotations**: Use `@LogExecutionTime` for performance monitoring
+5. **Leverage Utilities**: Use the utility classes for common operations
+
+## Contributing
+
+This is a core library meant to be reused across multiple projects. When adding new features:
+1. Ensure they are generic and reusable
+2. Follow existing patterns and conventions
+3. Add comprehensive documentation
+4. Include usage examples
+
+## License
+
+This project is licensed under the MIT License.
+
+## Authors
+
+- Initial work - Core Team
+
+## Acknowledgments
+
+- Spring Boot team for the excellent framework
+- Project Lombok for reducing boilerplate
+- Apache Commons for utility libraries

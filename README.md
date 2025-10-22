@@ -1,6 +1,6 @@
-# Core - Reusable Spring Boot Library
+# Spring Boot Core Library
 
-A comprehensive, production-ready Spring Boot core library that provides common functionality and best practices for building enterprise applications.
+A comprehensive, production-ready reusable library for Spring Boot projects. This library provides common utilities, exception handling, base entities, and configurations that can be shared across multiple Spring Boot applications.
 
 ## Features
 
@@ -56,16 +56,71 @@ A comprehensive, production-ready Spring Boot core library that provides common 
 ### Prerequisites
 - Java 17 or higher
 - Maven 3.6+
+- Spring Boot 3.x
 
 ### Installation
 
-Add this library as a dependency to your Spring Boot project:
+#### Option 1: Local Maven Install
+
+Build and install to your local Maven repository:
+
+```bash
+mvn clean install
+```
+
+Then add as a dependency in your Spring Boot project:
 
 ```xml
 <dependency>
     <groupId>pro.thinhha</groupId>
     <artifactId>core</artifactId>
     <version>0.0.1-SNAPSHOT</version>
+</dependency>
+```
+
+#### Option 2: Maven Repository
+
+Once published to Maven Central or your organization's repository, add the dependency:
+
+```xml
+<dependency>
+    <groupId>pro.thinhha</groupId>
+    <artifactId>core</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+</dependency>
+```
+
+### Important Notes
+
+**This is a library, not a standalone application.** It provides reusable components that you import into your Spring Boot projects. Most dependencies are marked as `optional`, so you only need to include the specific Spring Boot starters your application requires.
+
+### Required Dependencies in Your Application
+
+Depending on which features you use, add the corresponding Spring Boot starters to your application's `pom.xml`:
+
+```xml
+<!-- For REST controllers and web features -->
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-web</artifactId>
+</dependency>
+
+<!-- For JPA entities and repositories -->
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-data-jpa</artifactId>
+</dependency>
+
+<!-- For validation annotations -->
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-validation</artifactId>
+</dependency>
+
+<!-- For AOP features (logging aspects) -->
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-aop</artifactId>
 </dependency>
 ```
 

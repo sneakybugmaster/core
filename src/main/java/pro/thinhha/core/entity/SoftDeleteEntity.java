@@ -23,7 +23,7 @@ public abstract class SoftDeleteEntity extends BaseEntity {
     private LocalDateTime deletedAt;
 
     @Column(name = "deleted_by")
-    private String deletedBy;
+    private Long deletedBy;
 
     /**
      * Soft delete this entity.
@@ -34,9 +34,11 @@ public abstract class SoftDeleteEntity extends BaseEntity {
     }
 
     /**
-     * Soft delete this entity with user information.
+     * Soft delete this entity with user ID.
+     *
+     * @param deletedBy the ID of the user who deleted this entity
      */
-    public void delete(String deletedBy) {
+    public void delete(Long deletedBy) {
         this.deleted = true;
         this.deletedAt = LocalDateTime.now();
         this.deletedBy = deletedBy;

@@ -159,7 +159,11 @@ public class UserService {
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String deletedBy = authentication != null ? authentication.getName() : "system";
+        Long deletedBy = null;
+
+        if (authentication != null && authentication.getPrincipal() instanceof User) {
+            deletedBy = ((User) authentication.getPrincipal()).getId();
+        }
 
         user.delete(deletedBy);
         userRepository.save(user);

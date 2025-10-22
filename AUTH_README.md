@@ -13,7 +13,8 @@ This core library includes a comprehensive authentication and authorization modu
 - Automatic audit tracking (createdBy, updatedBy, deletedBy)
 - RESTful API endpoints
 - Token refresh mechanism
-- **Supports both Long and UUID primary keys** (see [UUID_GUIDE.md](UUID_GUIDE.md))
+- **Flexible ID types** - Use Long, UUID, or any Serializable type ([FLEXIBLE_ID_GUIDE.md](FLEXIBLE_ID_GUIDE.md))
+- **Type-safe generics** - `GenericBaseEntity<ID, AUDIT>` for maximum flexibility
 
 ## Quick Start
 

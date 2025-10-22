@@ -3,21 +3,27 @@ package pro.thinhha.core.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.data.annotation.CreatedBy;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedBy;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.io.Serializable;
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 /**
- * Base entity class with UUID primary key and audit fields.
- * Use this class when you want UUID-based IDs instead of Long.
+ * Base entity class with UUID primary key and UUID audit fields.
+ * This is a convenience class that extends GenericBaseEntity<UUID, UUID>.
  *
- * Example usage:
+ * You can also extend GenericBaseEntity directly for more flexibility:
+ * <pre>
+ * {@code
+ * // UUID ID with UUID audit
+ * @Entity
+ * public class Product extends GenericBaseEntity<UUID, UUID> { }
+ *
+ * // UUID ID with Long audit
+ * @Entity
+ * public class Product extends GenericBaseEntity<UUID, Long> { }
+ * }
+ * </pre>
+ *
+ * Or use this convenience class:
  * <pre>
  * {@code
  * @Entity
@@ -31,45 +37,13 @@ import java.util.UUID;
 @Getter
 @Setter
 @MappedSuperclass
-@EntityListeners(AuditingEntityListener.class)
-public abstract class UuidBaseEntity implements Serializable {
+public abstract class UuidBaseEntity extends GenericBaseEntity<UUID, UUID> {
 
+    @Override
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "id", updatable = false, nullable = false, columnDefinition = "UUID")
-    private UUID id;
-
-    @CreatedDate
-    @Column(nullable = false, updatable = false)
-    private LocalDateTime createdAt;
-
-    @LastModifiedDate
-    @Column(nullable = false)
-    private LocalDateTime updatedAt;
-
-    @CreatedBy
-    @Column(name = "created_by", updatable = false, columnDefinition = "UUID")
-    private UUID createdBy;
-
-    @LastModifiedBy
-    @Column(name = "updated_by", columnDefinition = "UUID")
-    private UUID updatedBy;
-
-    @Version
-    private Long version;
-
-    @PrePersist
-    protected void onCreate() {
-        if (createdAt == null) {
-            createdAt = LocalDateTime.now();
-        }
-        if (updatedAt == null) {
-            updatedAt = LocalDateTime.now();
-        }
-    }
-
-    @PreUpdate
-    protected void onUpdate() {
-        updatedAt = LocalDateTime.now();
+    @Column(name = "id", updatable = false, nullable = false)
+    public UUID getId() {
+        return super.getId();
     }
 }

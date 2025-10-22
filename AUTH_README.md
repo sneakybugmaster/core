@@ -10,9 +10,10 @@ This core library includes a comprehensive authentication and authorization modu
 - Password encryption with BCrypt
 - User management (CRUD operations)
 - Soft delete support for users
-- Automatic audit tracking (createdBy, updatedBy)
+- Automatic audit tracking (createdBy, updatedBy, deletedBy)
 - RESTful API endpoints
 - Token refresh mechanism
+- **Supports both Long and UUID primary keys** (see [UUID_GUIDE.md](UUID_GUIDE.md))
 
 ## Quick Start
 
@@ -51,7 +52,13 @@ app.jwt.refresh-expiration=604800000
 
 # Security (optional - enabled by default)
 app.security.enabled=true
+
+# Auditing ID type (optional - defaults to 'long')
+# Use 'uuid' if you want UUID-based IDs instead of Long
+app.auditing.id-type=long
 ```
+
+**Note:** For UUID-based authentication, see the [UUID Guide](UUID_GUIDE.md) for complete setup instructions.
 
 ### 3. Enable Component Scanning
 

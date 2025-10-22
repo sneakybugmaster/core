@@ -13,9 +13,7 @@ A comprehensive, production-ready reusable library for Spring Boot projects. Thi
   - `UnauthorizedException`: For authentication failures
   - `ForbiddenException`: For authorization failures
 
-### Response Wrappers
-- **ApiResponse**: Generic wrapper for successful API responses
-- **PageResponse**: Paginated response wrapper with Spring Data integration
+### Response DTOs
 - **ErrorResponse**: Standardized error response structure with validation support
 
 ### Base Entities
@@ -138,27 +136,6 @@ public class User extends BaseEntity {
 }
 ```
 
-#### Using Response Wrappers
-
-```java
-@RestController
-@RequestMapping("/api/v1/users")
-public class UserController {
-
-    @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<User>> getUser(@PathVariable Long id) {
-        User user = userService.findById(id);
-        return ResponseEntity.ok(ApiResponse.success(user));
-    }
-
-    @GetMapping
-    public ResponseEntity<ApiResponse<PageResponse<User>>> getUsers(Pageable pageable) {
-        Page<User> userPage = userService.findAll(pageable);
-        return ResponseEntity.ok(ApiResponse.success(PageResponse.from(userPage)));
-    }
-}
-```
-
 #### Using Custom Exceptions
 
 ```java
@@ -248,9 +225,7 @@ core/
 │   │   ├── ApiConstants.java
 │   │   └── ErrorMessages.java
 │   ├── dto/                 # Data Transfer Objects
-│   │   ├── ApiResponse.java
-│   │   ├── ErrorResponse.java
-│   │   └── PageResponse.java
+│   │   └── ErrorResponse.java
 │   ├── entity/              # Base entity classes
 │   │   ├── BaseEntity.java
 │   │   └── SoftDeleteEntity.java
@@ -329,10 +304,9 @@ public class CustomAuditingConfig {
 ## Best Practices
 
 1. **Extend Base Entities**: Use `BaseEntity` or `SoftDeleteEntity` for automatic audit tracking
-2. **Use Response Wrappers**: Standardize API responses with `ApiResponse` and `PageResponse`
-3. **Throw Custom Exceptions**: Use the provided exception hierarchy for consistent error handling
-4. **Apply Logging Annotations**: Use `@LogExecutionTime` for performance monitoring
-5. **Leverage Utilities**: Use the utility classes for common operations
+2. **Throw Custom Exceptions**: Use the provided exception hierarchy for consistent error handling
+3. **Apply Logging Annotations**: Use `@LogExecutionTime` for performance monitoring
+4. **Leverage Utilities**: Use the utility classes for common operations
 
 ## Contributing
 

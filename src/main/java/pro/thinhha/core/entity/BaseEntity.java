@@ -3,58 +3,42 @@ package pro.thinhha.core.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.data.annotation.CreatedBy;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedBy;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import java.time.LocalDateTime;
 
 /**
- * Base entity class with audit fields.
- * Extend this class for entities that need audit tracking.
+ * Base entity class with Long ID and Long audit fields.
+ * This is a convenience class that extends GenericBaseEntity<Long, Long>.
+ *
+ * For other ID types, you can extend GenericBaseEntity directly:
+ * <pre>
+ * {@code
+ * // UUID ID
+ * @Entity
+ * public class Product extends GenericBaseEntity<UUID, UUID> { }
+ *
+ * // String ID
+ * @Entity
+ * public class Product extends GenericBaseEntity<String, Long> { }
+ * }
+ * </pre>
+ *
+ * Or use this class for Long-based IDs:
+ * <pre>
+ * {@code
+ * @Entity
+ * public class Product extends BaseEntity { }
+ * }
+ * </pre>
  */
 @Getter
 @Setter
 @MappedSuperclass
-@EntityListeners(AuditingEntityListener.class)
-public abstract class BaseEntity {
+public abstract class BaseEntity extends GenericBaseEntity<Long, Long> {
 
+    @Override
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @CreatedDate
-    @Column(nullable = false, updatable = false)
-    private LocalDateTime createdAt;
-
-    @LastModifiedDate
-    @Column(nullable = false)
-    private LocalDateTime updatedAt;
-
-    @CreatedBy
-    @Column(updatable = false)
-    private String createdBy;
-
-    @LastModifiedBy
-    private String updatedBy;
-
-    @Version
-    private Long version;
-
-    @PrePersist
-    protected void onCreate() {
-        if (createdAt == null) {
-            createdAt = LocalDateTime.now();
-        }
-        if (updatedAt == null) {
-            updatedAt = LocalDateTime.now();
-        }
-    }
-
-    @PreUpdate
-    protected void onUpdate() {
-        updatedAt = LocalDateTime.now();
+    @Column(name = "id", updatable = false, nullable = false)
+    public Long getId() {
+        return super.getId();
     }
 }

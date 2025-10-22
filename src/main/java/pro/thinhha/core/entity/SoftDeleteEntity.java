@@ -1,53 +1,37 @@
 package pro.thinhha.core.entity;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
-
 /**
- * Base entity class with soft delete support.
- * Extend this class for entities that should be soft-deleted instead of hard-deleted.
+ * Base entity class with Long ID and soft delete support.
+ * This is a convenience class that extends GenericSoftDeleteEntity<Long, Long>.
+ *
+ * For other ID types, you can extend GenericSoftDeleteEntity directly:
+ * <pre>
+ * {@code
+ * // UUID ID
+ * @Entity
+ * public class Product extends GenericSoftDeleteEntity<UUID, UUID> { }
+ *
+ * // String ID
+ * @Entity
+ * public class Product extends GenericSoftDeleteEntity<String, Long> { }
+ * }
+ * </pre>
+ *
+ * Or use this class for Long-based IDs:
+ * <pre>
+ * {@code
+ * @Entity
+ * public class Product extends SoftDeleteEntity { }
+ * }
+ * </pre>
  */
 @Getter
 @Setter
 @MappedSuperclass
-public abstract class SoftDeleteEntity extends BaseEntity {
-
-    @Column(name = "deleted")
-    private boolean deleted = false;
-
-    @Column(name = "deleted_at")
-    private LocalDateTime deletedAt;
-
-    @Column(name = "deleted_by")
-    private String deletedBy;
-
-    /**
-     * Soft delete this entity.
-     */
-    public void delete() {
-        this.deleted = true;
-        this.deletedAt = LocalDateTime.now();
-    }
-
-    /**
-     * Soft delete this entity with user information.
-     */
-    public void delete(String deletedBy) {
-        this.deleted = true;
-        this.deletedAt = LocalDateTime.now();
-        this.deletedBy = deletedBy;
-    }
-
-    /**
-     * Restore a soft-deleted entity.
-     */
-    public void restore() {
-        this.deleted = false;
-        this.deletedAt = null;
-        this.deletedBy = null;
-    }
+public abstract class SoftDeleteEntity extends GenericSoftDeleteEntity<Long, Long> {
+    // Inherits all functionality from GenericSoftDeleteEntity
 }
